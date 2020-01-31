@@ -103,8 +103,11 @@
 
 	set ready
     wait 50 ticks
-    if Editable is true gosub to StartEditor
-    if the json count of Index is 0 go to EditRecord
+    if Editable is true
+    begin
+    	gosub to StartEditor
+    	if the json count of Index is 0 go to EditRecord
+    end
     stop    
 
 StartEditor:
