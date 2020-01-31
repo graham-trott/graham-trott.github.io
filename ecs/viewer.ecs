@@ -95,7 +95,7 @@
     begin
     	set style `display` of ViewerPanel to `block`
         set style `display` of EditorPanel to `none`
-        set style `display` of EditButton to `block`
+        if Editable set style `display` of EditButton to `block`
         set style `display` of SearchButton to `block`
         put the message into ID
         go to ViewRecord
@@ -306,12 +306,12 @@ ViewAnotherRecord:
     clear Container
     clear Father
     clear Mother
-	set style `display` of EditButton to `block`
+	if Editable set style `display` of EditButton to `block`
 	set style `display` of SearchButton to `block`
     go to ViewRecord
 
 Search:
-	set style `display` of EditButton to `none`
+	if Editable set style `display` of EditButton to `none`
 	set style `display` of SearchButton to `none`
     create Fieldset in Container
     create Legend in Fieldset
@@ -339,7 +339,7 @@ Search:
     on click CancelButton
     begin
     	remove element Fieldset
-		set style `display` of EditButton to `block`
+		if Editable set style `display` of EditButton to `block`
 		set style `display` of SearchButton to `block`
         stop
     end
