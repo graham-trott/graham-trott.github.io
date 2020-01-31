@@ -121,7 +121,10 @@ GetSiblings:
         while M is less than the json count of C
         begin
         	put element M of C into ID2
-            if ID is not ID2 json add ID2 to List
+            if ID is not ID2
+            begin
+            	if the index of ID2 in List is -1 json add ID2 to List
+            end
         	add 1 to M
         end
     end

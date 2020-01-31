@@ -162,10 +162,11 @@ ViewRecord:
     if OtherNames is not empty put Text cat ` ` cat OtherNames into Text
     put Text cat ` ` cat FamilyName into Text
     set the content of Title to Text
-    
+
+DoMother:
     put property `mother` of Record into MID
-    if not MID go to VR2
-    rest get Record2 from `/people/` cat MID cat `.json` or go to VR2
+    if not MID go to DoFather
+    rest get Record2 from `/people/` cat MID cat `.json` or go to DoFather
     put property `gname` of Record2 into GivenName
     put property `oname` of Record2 into OtherNames
     put property `fname` of Record2 into FamilyName
@@ -181,10 +182,10 @@ ViewRecord:
     	put Mother cat FamilyName into Mother
     end
 
-VR2:
+DoFather:
     put property `father` of Record into FID
-    if not FID go to VR3
-    rest get Record2 from `/people/` cat FID cat `.json` or go to VR3
+    if not FID go to DoParents
+    rest get Record2 from `/people/` cat FID cat `.json` or go to DoParents
     put property `gname` of Record2 into GivenName
     put property `oname` of Record2 into OtherNames
     put property `fname` of Record2 into FamilyName
@@ -200,8 +201,8 @@ VR2:
     	put Father cat FamilyName into Father
     end
 
-VR3:
-	if Mother cat Father is empty go to VR4
+DoParents:
+	if Mother cat Father is empty go to DoChildren
     create Para in Container
     if Mother is not empty
     begin
@@ -233,7 +234,7 @@ VR3:
         end
     end
 
-VR4:
+DoChildren:
 	put property ID of Map into Item
     put property `children` of Item into List
     if the json count of List is not 0
@@ -252,7 +253,7 @@ VR4:
         	index Child to N
         	index ChildLink to N
 	    	put element N of List into Child
-	        rest get Record2 from `/people/` cat Child cat `.json` or go to VR5
+	        rest get Record2 from `/people/` cat Child cat `.json` or go to DoSiblings
 	        put property `gname` of Record2 into GivenName
 	        put property `gender` of Record2 into Gender
             create Label in Para
@@ -271,7 +272,7 @@ VR4:
 	    end
     end
 
-VR5:
+DoSiblings:
 	put property ID of Map into Item
     put property `siblings` of Item into List
     if the json count of List is not 0
@@ -294,7 +295,7 @@ VR5:
             else if Gender is `f` set the content of Label to `Sister: `
             else set the content of Label to `Sibling: `
             create SiblingLink in Para
-            set the content of SiblingLink to GivenName cat ` ` cat FamilyName
+            set the content of SiblingLink to GivenName
             on click SiblingLink
             begin
             	index Sibling to the index of SiblingLink
@@ -310,6 +311,9 @@ ViewAnotherRecord:
     clear Container
     clear Father
     clear Mother
+    clear GivenName
+    clear OtherNames
+    clear FamilyName
 	if Editable set style `display` of EditButton to `block`
 	set style `display` of SearchButton to `block`
     go to ViewRecord
