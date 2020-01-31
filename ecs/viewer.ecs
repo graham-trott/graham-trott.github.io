@@ -52,6 +52,7 @@
     variable N
     
     get Editable from storage as `editable`
+    if Editable is `true` set Editable else clear Editable
     
     clear body
     create Body in body
@@ -83,7 +84,7 @@
     create EditorPanel in Body
     set style `display` of EditorPanel to `none`
 
-	if Editable is `true`
+	if Editable
     begin
 		create EditButton in ViewerPanel
 	    set the style of EditButton to `width:3vw;height:3vw;position:absolute;top:10vh;right:15vw`
@@ -103,7 +104,7 @@
 
 	set ready
     wait 50 ticks
-    if Editable is true
+    if Editable
     begin
     	gosub to StartEditor
     	if the json count of Index is 0 go to EditRecord
