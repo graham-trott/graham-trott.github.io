@@ -1,0 +1,139 @@
+!   Topics Editor
+
+    script EditTopics
+    
+    import div Form
+    
+	div Row
+    div Label
+    div Panel
+    div TopicPanel
+    div ButtonRow
+    select TopicSelect
+    button AddTopicButton
+    button EditTopicButton
+    button RenameTopicButton
+    button DeleteTopicButton
+    textarea TopicInput
+    variable Index
+    variable TopicList
+    variable TopicIDs
+    variable Topic
+    variable ID
+    variable TID
+    variable Record
+    variable Name
+    variable Message
+    variable Content
+    variable Count
+    variable N
+    
+    rest post to `makedirs/topics`
+	rest get Content from `list/topics`
+    put property `files` of Content into Content
+    clear Index
+    put 0 into N
+    while N is less than the json count of Content
+    begin
+    	put element N of Content into ID
+        put the position of the last `.` in ID into Count
+        put left Count of ID into ID
+        json add ID to Index
+    	add 1 to N
+    end
+
+    on message
+    begin
+    	put the message into Message
+    	if Message is `exit` exit
+    	put Message into ID
+        go to DoTopic
+    end
+	set ready
+    stop
+
+DoTopic:
+    create Row in Form
+    set the class of Row to `rowstyle`
+    create Label in Row
+    set the class of Label to `labelstyle`
+    set the content of Label to `Topics:`
+    
+    create Panel in Row
+    set the class of Panel to `inputstyle`
+    
+    create ButtonRow in Panel
+
+!	Do the topic selector
+    create TopicSelect in ButtonRow
+    set the style of TopicSelect to `width:15em`
+!    set TopicSelect from TopicList
+    on change TopicSelect gosub to EnableButtons
+
+!	Do the Add Topic button
+    create AddTopicButton in ButtonRow
+    set the style of AddTopicButton to `margin-left:0.5em`
+    set the text of AddTopicButton to `Add Topic`
+    on click AddTopicButton gosub to AddTopic
+
+!	Do the Edit Topic button
+	create EditTopicButton in ButtonRow
+    set the style of EditTopicButton to `margin-left:0.5em`
+    set the text of EditTopicButton to `Edit Topic`
+    on click EditTopicButton go to EditTopic
+
+!	Do the Rename Topic button
+	create RenameTopicButton in ButtonRow
+    set the style of RenameTopicButton to `margin-left:0.5em`
+    set the text of RenameTopicButton to `Rename Topic`
+    on click RenameTopicButton
+    begin
+    end
+
+!	Do the Delete Topic button
+	create DeleteTopicButton in ButtonRow
+    set the style of DeleteTopicButton to `margin-left:0.5em`
+    set the text of DeleteTopicButton to `Delete Topic`
+    on click DeleteTopicButton
+    begin
+    end
+
+!	Create the editing panel
+	create TopicPanel in Panel
+    fork to EditTopic
+    stop
+
+NewTopic:
+    put prompt `Type the new topic name:` with `New Topic` into Name
+    if Name
+    begin
+    	gosub to AddTopic
+    	put element 0 of TopicIDs into TID
+    	put property TID of TopicList into Name
+    	set TopicSelect from TopicList as Name
+    end
+    stop
+
+AddTopic:
+    put now into TID
+    if the json index of TID in TopicIDs is -1
+    begin
+        clear Topic
+        set property `id` of Topic to TID
+        set property `owner` of Topic to ID
+        set property `name` of Topic to Name
+        rest post to `makedirs/topics/` cat ID
+        rest post Topic to `save/topics/` cat ID cat `/` cat TID cat `.json`
+        json add TID to TopicIDs
+        set property `topics` of Record to TopicIDs
+        send `save` to parent
+        json add Name to TopicList
+    end
+	return
+
+EditTopic:
+	clear TopicPanel
+    set the style of TopicPanel to `width:100%;height:calc(100% - 3em)`
+    create TopicInput in TopicPanel
+    set the style of TopicInput to `width:100%;height:20em`
+	stop

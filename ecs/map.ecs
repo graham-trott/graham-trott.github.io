@@ -1,0 +1,144 @@
+!	Get the index and map
+
+	script GetMap
+    
+    variable Map
+    variable Index
+    variable Record
+    variable Item
+    variable Item2
+    variable Content
+    variable ID
+    variable ID2
+    variable List
+    variable P
+    variable C
+    variable D
+    variable N
+    variable M
+    variable A
+    variable B
+    variable V
+    
+!	Get all the record IDs as a list
+	rest get Content from `list/people` or go to Error
+    put property `files` of Content into Content
+    clear Index
+    put 0 into N
+    while N is less than the json count of Content
+    begin
+    	put element N of Content into ID
+        put the position of the last `.` in ID into D
+        put left D of ID into ID
+        json add ID to Index
+    	add 1 to N
+    end
+    if Index is empty put `[]` into Index else sort Index with SortIndex
+	rest post Index to `save/index.json`
+
+  	set Map to object
+   	put 0 into N
+    while N is less than the json count of Index
+    begin
+        set Item to object
+      	put element N of Index into ID
+   		rest get Record from `/people/` cat ID cat `.json` or go to Error
+        put property `mother` of Record into P
+        if P is not empty set property `mother` of Item to P
+        put property `father` of Record into P
+        if P is not empty set property `father` of Item to P
+        set property ID of Map to Item
+       	add 1 to N
+    end
+    put 0 into N
+    while N is less than the json count of Index
+    begin
+       	put element N of Index into ID
+        gosub to GetChildren
+       	add 1 to N
+    end
+    put 0 into N
+    while N is less than the json count of Index
+    begin
+       	put element N of Index into ID
+        gosub to GetSiblings
+       	add 1 to N
+    end
+    rest post Map to `save/map.json` or continue
+	exit
+
+!	Set all the relationships exposed in the Item whose id is ID
+GetChildren:
+	put property ID of Map into Item
+	put property `mother` of Item into P
+    if P is not empty
+    begin
+        put property P of Map into Item2
+        put property `children` of Item2 into C
+        json add ID to C
+        set property `children` of Item2 to C
+        set property P of Map to Item2
+    end
+	put property `father` of Item into P
+    if P is not empty
+    begin
+        put property P of Map into Item2
+        put property `children` of Item2 into C
+        json add ID to C
+        set property `children` of Item2 to C
+        set property P of Map to Item2
+    end
+    return
+
+!	Parse the map to identify siblings
+GetSiblings:
+	put property ID of Map into Item
+	set List to array
+	put property `mother` of Item into P
+    if P is not empty
+    begin
+        put property P of Map into Item2
+        put property `children` of Item2 into C
+        put 0 into M
+        while M is less than the json count of C
+        begin
+        	put element M of C into ID2
+            if ID is not ID2
+            begin
+            	if the index of ID2 in List is -1 json add ID2 to List
+            end
+        	add 1 to M
+        end
+    end
+    if the json count of List is not 0 set property `siblings` of Item to List
+    set property ID of Map to Item
+	put property `father` of Item into P
+    if P is not empty
+    begin
+        put property P of Map into Item2
+        put property `children` of Item2 into C
+        put 0 into M
+        while M is less than the json count of C
+        begin
+        	put element M of C into ID2
+            if ID is not ID2 json add ID2 to List
+        	add 1 to M
+        end
+    end
+    if the json count of List is not 0 set property `siblings` of Item to List
+    set property ID of Map to Item
+	return
+
+!	Sort the index
+SortIndex:
+    put arg `a` of Index into A
+    put arg `b` of Index into B
+    if A is greater than B put 1 into V
+    else if A is less than B put -1 into V
+    else put 0 into V
+    set arg `v` of Index to V
+    stop
+
+Error:
+	alert `An error occurred - please reload this page.`
+    exit

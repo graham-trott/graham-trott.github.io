@@ -1,0 +1,83 @@
+!   Topics
+
+    script Topics
+    
+    import div Form
+    	and variable Record
+    
+	div Row
+    div Label
+    div TopicDiv
+    textarea TopicText
+    button AddTopicButton
+    variable Topics
+    variable Topic
+    variable Key
+    variable ID
+    variable TID
+    variable Text
+    variable Message
+    variable Count
+    variable N
+    
+!	Show the topics
+	put property `id` of Record into ID
+    put property `topics` of Record into Topics
+    if Topics is `` put `[]` into Topics
+    put the json count of Topics into Count
+    set the elements of TopicText to Count
+    put 0 into N
+    while N is less than Count
+    begin
+    	put element N of Topics into TID
+    	rest get Topic from `/topics/` cat ID cat `/` cat TID cat `.json` or go to T2
+        create Row in Form
+        set the class of Row to `rowstyle`
+        create Label in Row
+        set the class of Label to `labelstyle`
+        set the content of Label to property `name` of Topic
+        index TopicText to N
+        create TopicText in Row
+        set the class of TopicText to `inputstyle`
+T2:
+    	add 1 to N
+    end
+
+!	Do the Add Topic button
+    create Row in Form
+    set the class of Row to `rowstyle`
+    create AddTopicButton in Row
+    set the text of AddTopicButton to `Add Topic`
+    on click AddTopicButton
+    begin
+        put prompt `Type the new topic name:` with `New Topic` into Text
+        if Text
+        begin
+            clear Topic
+            put `` cat now into TID
+            set property `id` of Topic to TID
+            set property `owner` of Topic to ID
+            set property `name` of Topic to Text
+            rest post to `makedirs/topics/` cat ID
+            rest post Topic to `save/topics/` cat ID cat `/` cat TID cat `.json`
+            if the json index of TID in Topics is -1
+            begin
+            	json add TID to Topics
+                set property `topics` of Record to Topics
+            end
+        end
+    	create TopicDiv in Form
+        rest get Script from `/ecs/edittopic.ecs`
+        run Script with TopicDiv and Record as TopicModule
+        send `start` to TopicModule
+    end
+
+    on message
+    begin
+    	put the message into Message
+    	if Message is `exit` exit
+    end
+    stop
+
+    set ready
+    stop
