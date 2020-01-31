@@ -171,16 +171,6 @@ DoMother:
     put property `oname` of Record2 into OtherNames
     put property `fname` of Record2 into FamilyName
     put GivenName into Mother
-    if OtherNames is not empty
-    begin
-    	if Mother is not empty put Mother cat ` ` into Mother
-    	put Mother cat OtherNames into Mother
-    end
-    if FamilyName is not empty
-    begin
-    	if Mother is not empty put Mother cat ` ` into Mother
-    	put Mother cat FamilyName into Mother
-    end
 
 DoFather:
     put property `father` of Record into FID
@@ -190,16 +180,6 @@ DoFather:
     put property `oname` of Record2 into OtherNames
     put property `fname` of Record2 into FamilyName
     put GivenName into Father
-    if OtherNames is not empty
-    begin
-    	if Father is not empty put Father cat ` ` into Father
-    	put Father cat OtherNames into Father
-    end
-    if FamilyName is not empty
-    begin
-    	if Father is not empty put Father cat ` ` into Father
-    	put Father cat FamilyName into Father
-    end
 
 DoParents:
 	if Mother cat Father is empty go to DoChildren
@@ -279,7 +259,6 @@ DoSiblings:
     begin
     	set the elements of Sibling to the json count of List
     	set the elements of SiblingLink to the json count of List
-    	create Para in Container
 	    put 0 into N
 	    while N is less than the json count of List
 	    begin
@@ -290,6 +269,8 @@ DoSiblings:
 	        put property `gname` of Record2 into GivenName
 	        put property `fname` of Record2 into FamilyName
 	        put property `gender` of Record2 into Gender
+	        create Label in Para
+            set the content of Label to `&nbsp;&nbsp;&nbsp;`
             create Label in Para
             if Gender is `m` set the content of Label to `Brother: `
             else if Gender is `f` set the content of Label to `Sister: `
