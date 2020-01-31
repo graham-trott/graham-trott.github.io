@@ -31,7 +31,7 @@
     rest post to `makedirs/topics`
 	rest get Content from `list/topics`
     put property `files` of Content into Content
-    clear Index
+    set Index to array
     put 0 into N
     while N is less than the json count of Content
     begin
@@ -41,6 +41,15 @@
         json add ID to Index
     	add 1 to N
     end
+    if the json count of Index is 0
+    begin
+    	put `T` cat now into TID
+        json add TID to Index
+        set Topic to object
+        set property `id` of Topic to TID
+        rest post Topic to `save/topics/` cat TID cat `.json`
+    end
+    print Index
 
     on message
     begin

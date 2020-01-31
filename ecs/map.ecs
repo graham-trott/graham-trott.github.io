@@ -1,6 +1,6 @@
 !	Get the index and map
 
-	script GetMap
+	script Map
     
     variable Map
     variable Index
