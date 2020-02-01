@@ -1,18 +1,5 @@
 !   This is me
 
-!	These are the main data objects:
-
-!	1. A "record", which comprises all the information relating to a single individual.
-!	Record properties are handled by this main script and also by other scripts
-!	called as needed.
-!	Each record has a unique ID comprising the user ID and the timestamp of record creation.
-!	Records are stored in individual files in the "map" folder or in a database,
-!	where the record ID is used as the filename or database record key.
-
-!	2. "index.json"; a list of record IDs obtained by scanning the "map" folder.
-
-!	3. "map.json"; key information from all the records in the index.
-
     script ThisIsMe
     
     variable Editable
@@ -37,4 +24,3 @@ Start:
     rest get Script from `/ecs/viewer.ecs`
     run Script as ViewerModule
     send `-` to ViewerModule
-	stop

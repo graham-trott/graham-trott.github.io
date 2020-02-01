@@ -1,5 +1,18 @@
 !	Get the index and map
 
+!	These are the main data objects:
+
+!	1. A "record", which comprises all the information relating to a single individual.
+!	Record properties are handled by this main script and also by other scripts
+!	called as needed.
+!	Each record has a unique ID comprising the user ID and the timestamp of record creation.
+!	Records are stored in individual files in the "map" folder or in a database,
+!	where the record ID is used as the filename or database record key.
+
+!	2. "index.json"; a list of record IDs obtained by scanning the "people" folder.
+
+!	3. "map.json"; key information from all the records in the index.
+
 	script Map
     
     variable Map
@@ -23,7 +36,7 @@
 !	Get all the record IDs as a list
 	rest get Content from `list/people` or go to Error
     put property `files` of Content into Content
-    clear Index
+    set Index to array
     put 0 into N
     while N is less than the json count of Content
     begin
@@ -33,7 +46,18 @@
         json add ID to Index
     	add 1 to N
     end
-    if Index is empty put `[]` into Index else sort Index with SortIndex
+    sort Index with SortIndex
+!	If no records, create the first one.
+    if the json count of Index is 0
+    begin
+    	put `P` cat now into ID
+    	set Record to object
+        set property `id` of Record to ID
+        print `First`
+        print Record
+        rest post Record to `save/people/` cat ID cat `.json`
+        json add ID to Index
+    end
 	rest post Index to `save/index.json`
 
   	set Map to object
@@ -43,6 +67,7 @@
         set Item to object
       	put element N of Index into ID
    		rest get Record from `/people/` cat ID cat `.json` or go to Error
+        put empty into P
         put property `mother` of Record into P
         if P is not empty set property `mother` of Item to P
         put property `father` of Record into P

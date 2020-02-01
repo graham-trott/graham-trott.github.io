@@ -106,48 +106,36 @@
     wait 50 ticks
     if Editable
     begin
-    	gosub to StartEditor
     	if the json count of Index is 0 go to EditRecord
     end
-    stop    
-
-StartEditor:
-    if EditorModule is not running
-    begin
-	    rest get Script from `/ecs/editor.ecs`
-	    run Script with EditorPanel as EditorModule
-    end
-    return
-
-EditRecord:
-   	gosub to StartEditor
-   	set style `display` of ViewerPanel to `none`
-    set style `display` of EditorPanel to `block`
-    send ID to EditorModule
-	stop
+    stop   
 
 ViewRecord:
     rest get Index from `/index.json`
     or begin
-    	put `[]` into Index
+    	set Index to array
         continue
     end
     rest get Map from `/map.json`
     or begin
-    	put `[]` into Map
+    	set Map to array
         continue
     end
     
     if ID is `-`
     begin
-    	if the json count of Index is 0 go to EditRecord
         get ID from storage as `current`
         if ID is empty go to Search
     end
-    put ID into storage as `current`
+    else put ID into storage as `current`
     
 	if ID is empty stop
-    rest get Record from `/people/` cat ID cat `.json` or stop
+    rest get Record from `/people/` cat ID cat `.json` or
+    begin
+    	put element 0 of Index into ID
+    	put ID into storage as `current`
+        continue
+    end
     
     put property `fname` of Record into FamilyName
     put property `oname` of Record into OtherNames
@@ -297,7 +285,22 @@ ViewAnotherRecord:
     clear FamilyName
 	if Editable set style `display` of EditButton to `block`
 	set style `display` of SearchButton to `block`
-    go to ViewRecord
+    go to ViewRecord 
+
+StartEditor:
+    if EditorModule is not running
+    begin
+	    rest get Script from `/ecs/editor.ecs`
+	    run Script with EditorPanel as EditorModule
+    end
+    return
+
+EditRecord:
+   	gosub to StartEditor
+   	set style `display` of ViewerPanel to `none`
+    set style `display` of EditorPanel to `block`
+    send ID to EditorModule
+	stop
 
 Search:
 	if Editable set style `display` of EditButton to `none`

@@ -2,7 +2,7 @@
 
     script EditTopics
     
-    import div Form
+    import div Form and variable Record
     
 	div Row
     div Label
@@ -19,15 +19,15 @@
     variable TopicList
     variable TopicIDs
     variable Topic
-    variable ID
     variable TID
-    variable Record
     variable Name
     variable Message
     variable Content
     variable Count
     variable N
     
+    set TopicIDs to array
+    set TopicList to array
     rest post to `makedirs/topics`
 	rest get Content from `list/topics`
     put property `files` of Content into Content
@@ -35,10 +35,12 @@
     put 0 into N
     while N is less than the json count of Content
     begin
-    	put element N of Content into ID
-        put the position of the last `.` in ID into Count
-        put left Count of ID into ID
-        json add ID to Index
+    	put element N of Content into TID
+        put the position of the last `.` in TID into Count
+        put left Count of TID into TID
+        json add TID to Index
+        json add TID to TopicIDs
+        json add `Index` to TopicList
     	add 1 to N
     end
     if the json count of Index is 0
@@ -47,15 +49,17 @@
         json add TID to Index
         set Topic to object
         set property `id` of Topic to TID
+        set property `name` of Topic to `Index`
         rest post Topic to `save/topics/` cat TID cat `.json`
+        json add TID to TopicIDs
+        json add `Index` to TopicList
     end
-    print Index
 
     on message
     begin
     	put the message into Message
     	if Message is `exit` exit
-    	put Message into ID
+    	put Message into TID
         go to DoTopic
     end
 	set ready
@@ -76,8 +80,8 @@ DoTopic:
 !	Do the topic selector
     create TopicSelect in ButtonRow
     set the style of TopicSelect to `width:15em`
-!    set TopicSelect from TopicList
-    on change TopicSelect gosub to EnableButtons
+    set TopicSelect from TopicList
+    on change TopicSelect gosub to ShowTopic
 
 !	Do the Add Topic button
     create AddTopicButton in ButtonRow
@@ -110,7 +114,17 @@ DoTopic:
 !	Create the editing panel
 	create TopicPanel in Panel
     fork to EditTopic
-    stop
+    gosub to ShowTopic
+	stop
+
+ShowTopic:
+    put the selected index in TopicSelect into N
+    if N is less than 0 return
+    put element N of TopicIDs into TID
+    rest get Content from `/topics/` cat TID cat `.json`
+    put property `text` of Content into Content
+    set the content of TopicInput to Content
+	return
 
 NewTopic:
     put prompt `Type the new topic name:` with `New Topic` into Name
@@ -124,18 +138,16 @@ NewTopic:
     stop
 
 AddTopic:
-    put now into TID
+    put `T` cat now into TID
     if the json index of TID in TopicIDs is -1
     begin
         clear Topic
         set property `id` of Topic to TID
-        set property `owner` of Topic to ID
+        set property `owner` of Topic to TID
         set property `name` of Topic to Name
-        rest post to `makedirs/topics/` cat ID
-        rest post Topic to `save/topics/` cat ID cat `/` cat TID cat `.json`
+        rest post to `makedirs/topics/` cat TID
+        rest post Topic to `save/topics/` cat TID cat `/` cat TID cat `.json`
         json add TID to TopicIDs
-        set property `topics` of Record to TopicIDs
-        send `save` to parent
         json add Name to TopicList
     end
 	return

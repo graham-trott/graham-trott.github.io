@@ -68,6 +68,14 @@
     begin
     	put the message into Message
     	if Message is `exit` exit
+        if Message is `clear`
+        begin
+        	index Parent to 0
+            clear Parent
+            index Parent to 1
+            clear Parent
+            stop
+        end
        	put property `mother` of MainRecord into ID
         if ID is not empty
         begin
@@ -134,7 +142,6 @@ FindParent:
     	add 1 to N
     end
     put the json count of Selection into N
-    print Selection
     if N is greater than 0
     begin
     	if N is 1

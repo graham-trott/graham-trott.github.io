@@ -35,7 +35,7 @@
     module TopicsModule
 
 !	Set up the screen
-ER2:
+Setup:
 	clear Container
     
     create Form in Container
@@ -119,7 +119,6 @@ ER2:
     set the text of ViewRecordButton to `Save/View record`
     on click ViewRecordButton
     begin
-    	gosub to StopChildModules
         go to ViewRecord
     end
     
@@ -128,7 +127,6 @@ ER2:
     set the text of NewRecordButton to `New record`
     on click NewRecordButton
     begin
-    	gosub to StopChildModules
         go to NewRecord
     end
     
@@ -137,7 +135,6 @@ ER2:
     set the text of CancelButton to `Cancel`
     on click CancelButton
     begin
-    	gosub to StopChildModules
     	rest get Record from `/people/` cat ID cat `.json` or stop
         go to Cancel
     end
@@ -145,14 +142,15 @@ ER2:
     on message
     begin
       	put the message into ID
-    	if ID is empty put `P` cat now into ID
+    	if ID is `-` put `P` cat now into ID
+        set Record to object
        	rest get Record from `/people/` cat ID cat `.json` or stop
         put property `gname` of Record into Item
-        if Item is not empty set the content of GivenName to Item
+        set the content of GivenName to Item
         put property `fname` of Record into Item
-        if Item is not empty set the content of FamilyName to Item
+        set the content of FamilyName to Item
         put property `oname` of Record into Item
-        if Item is not empty set the content of OtherNames to Item
+        set the content of OtherNames to Item
         put property `gender` of Record into G
         if G is `m` set attribute `checked` of GenderM to `checked`
         else if G is `f` set attribute `checked` of GenderF to `checked`
@@ -169,6 +167,28 @@ ER2:
 
 	set ready
 	stop
+
+!	View the current record
+ViewRecord:
+    if GivenName is empty go to MissingData
+    gosub to SaveRecord
+Cancel:
+	if ParentsModule is running send `exit` to ParentsModule
+	if TopicsModule is running send `exit` to TopicsModule
+	send ID to parent
+	exit
+
+!	Create a new record
+NewRecord:
+    if GivenName is empty go to MissingData
+    gosub to SaveRecord
+    clear GivenName
+    clear OtherNames
+    clear FamilyName
+    send `clear` to ParentsModule
+    set Record to object
+    put `P` cat now into ID
+    stop
 
 !	Save the current record
 SaveRecord:
@@ -188,31 +208,9 @@ SaveRecord:
     print `Record for '` cat GivenName cat ` ` cat FamilyName cat `' saved`
 	return
 
-!	View the current record
-ViewRecord:
-    if GivenName is empty go to MissingData
-    gosub to SaveRecord
-Cancel:
-	send ID to parent
-	stop
-
-!	Create a new record
-NewRecord:
-    if GivenName is empty go to MissingData
-    gosub to SaveRecord
-	gosub to StopChildModules
-    clear Record
-    put `P` cat now into ID
-    go to ER2
-
 MissingData:
 	alert `Please provide the given name.`
     stop
-
-StopChildModules:
-	if ParentsModule is running send `exit` to ParentsModule
-	if TopicsModule is running send `exit` to TopicsModule
-    return
 
 !	Function to sort the index
 SortIndex:
