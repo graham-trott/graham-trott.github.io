@@ -128,7 +128,7 @@ ViewRecord:
         if ID is empty go to Search
     end
     else put ID into storage as `current`
-    
+
 	if ID is empty stop
     rest get Record from `/people/` cat ID cat `.json` or
     begin

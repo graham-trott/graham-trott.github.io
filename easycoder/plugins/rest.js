@@ -15,12 +15,7 @@ const EasyCoder_Rest = {
 						if (compiler.nextTokenIs(`from`)) {
 							const url = compiler.getNextValue();
 							var onError = null;
-							if (compiler.tokenIs(`or`)) {
-								compiler.next();
-								onError = compiler.getPc() + 1;
-								compiler.completeHandler();
-							}
-							compiler.addCommand({
+							let command = {
 								domain: `rest`,
 								keyword: `rest`,
 								lino,
@@ -28,7 +23,15 @@ const EasyCoder_Rest = {
 								target: targetRecord.name,
 								url,
 								onError
-							});
+							};
+							if (compiler.tokenIs(`or`)) {
+								compiler.next();
+								command.onError = compiler.getPc() + 1;
+								compiler.addCommand(command);
+								compiler.completeHandler();
+							} else {
+								compiler.addCommand(command);
+							}
 							return true;
 						}
 					}
