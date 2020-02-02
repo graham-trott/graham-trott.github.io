@@ -43,19 +43,22 @@
     	put element N of Content into ID
         put the position of the last `.` in ID into D
         put left D of ID into ID
-        json add ID to Index
+        json add from 1 of ID to Index
     	add 1 to N
     end
     sort Index with SortIndex
 !	If no records, create the first one.
     if the json count of Index is 0
     begin
-    	put `P` cat now into ID
+    	put `` cat now into ID
     	set Record to object
-        set property `id` of Record to ID
-        print `First`
-        print Record
-        rest post Record to `save/people/` cat ID cat `.json`
+        set property `gname` of Record to empty
+        set property `fname` of Record to empty
+        set property `oname` of Record to empty
+        set property `mother` of Record to empty
+        set property `father` of Record to empty
+        print `First is ` cat ID
+        rest post Record to `save/people/P` cat ID cat `.json`
         json add ID to Index
     end
 	rest post Index to `save/index.json`
@@ -66,7 +69,7 @@
     begin
         set Item to object
       	put element N of Index into ID
-   		rest get Record from `/people/` cat ID cat `.json` or go to Error
+   		rest get Record from `/people/P` cat ID cat `.json` or go to Error
         put empty into P
         put property `mother` of Record into P
         if P is not empty set property `mother` of Item to P

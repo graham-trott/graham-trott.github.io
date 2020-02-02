@@ -2,6 +2,7 @@
 
     script Viewer
     
+    div Tracer
     div Body
     div Container
     div ViewerPanel
@@ -57,6 +58,7 @@
     clear body
     create Body in body
     set the style of Body to `position:relative;width:calc(100vw - 20px);height:calc(100vh - 20px)`
+    
     create ViewerPanel in Body
     set the style of ViewerPanel to `width:100%;height:100%`
     
@@ -103,43 +105,29 @@
     end
 
 	set ready
-    wait 50 ticks
-    if Editable
-    begin
-    	if the json count of Index is 0 go to EditRecord
-    end
     stop   
 
 ViewRecord:
+    create Tracer in Container
+    set the id of Tracer to `easycoder-tracer`
+
     rest get Index from `/index.json`
-    or begin
-    	set Index to array
-        continue
-    end
     rest get Map from `/map.json`
-    or begin
-    	set Map to array
-        continue
-    end
-    
+
     if ID is `-`
     begin
         get ID from storage as `current`
-        if ID is empty go to Search
+        if ID is empty put element 0 of Index into ID
     end
-    else put ID into storage as `current`
+    put ID into storage as `current`
 
-	if ID is empty stop
-    rest get Record from `/people/` cat ID cat `.json` or
-    begin
-    	put element 0 of Index into ID
-    	put ID into storage as `current`
-        continue
-    end
+    rest get Record from `/people/P` cat ID cat `.json`
     
+    put property `gname` of Record into GivenName
+    if GivenName is empty go to EditRecord
+
     put property `fname` of Record into FamilyName
     put property `oname` of Record into OtherNames
-    put property `gname` of Record into GivenName
     put empty into Mother
     put empty into Father
     
@@ -154,7 +142,7 @@ ViewRecord:
 DoMother:
     put property `mother` of Record into MID
     if not MID go to DoFather
-    rest get Record2 from `/people/` cat MID cat `.json` or go to DoFather
+    rest get Record2 from `/people/P` cat MID cat `.json` or go to DoFather
     put property `gname` of Record2 into GivenName
     put property `oname` of Record2 into OtherNames
     put property `fname` of Record2 into FamilyName
@@ -163,7 +151,7 @@ DoMother:
 DoFather:
     put property `father` of Record into FID
     if not FID go to DoParents
-    rest get Record2 from `/people/` cat FID cat `.json` or go to DoParents
+    rest get Record2 from `/people/P` cat FID cat `.json` or go to DoParents
     put property `gname` of Record2 into GivenName
     put property `oname` of Record2 into OtherNames
     put property `fname` of Record2 into FamilyName
@@ -221,7 +209,7 @@ DoChildren:
         	index Child to N
         	index ChildLink to N
 	    	put element N of List into Child
-	        rest get Record2 from `/people/` cat Child cat `.json` or go to DoSiblings
+	        rest get Record2 from `/people/P` cat Child cat `.json` or go to DoSiblings
 	        put property `gname` of Record2 into GivenName
 	        put property `gender` of Record2 into Gender
             create Label in Para
@@ -253,7 +241,7 @@ DoSiblings:
         	index Sibling to N
         	index SiblingLink to N
 	    	put element N of List into Sibling
-	        rest get Record2 from `/people/` cat Sibling cat `.json` or go to DoButtons
+	        rest get Record2 from `/people/P` cat Sibling cat `.json` or go to DoButtons
 	        put property `gname` of Record2 into GivenName
 	        put property `fname` of Record2 into FamilyName
 	        put property `gender` of Record2 into Gender
@@ -350,7 +338,7 @@ S2:
     while N is less than the json count of Index
     begin
     	put element N of Index into ID
-        rest get Record from `/people/` cat ID cat `.json`
+        rest get Record from `/people/P` cat ID cat `.json`
         put property `fname` of Record into FamilyName
         put property `gname` of Record into GivenName
         if Name is GivenName cat ` ` cat FamilyName
@@ -381,7 +369,7 @@ SR2:
         while N is less than the json count of Selection
         begin
         	put element N of Selection into ID
-    		rest get Record from `/people/` cat ID cat `.json`
+    		rest get Record from `/people/P` cat ID cat `.json`
             put property `fname` of Record into FamilyName
             put property `gname` of Record into GivenName
             put property `dob` of Record into Date

@@ -14,24 +14,21 @@ const EasyCoder_Rest = {
 					if (targetRecord.keyword === `variable`) {
 						if (compiler.nextTokenIs(`from`)) {
 							const url = compiler.getNextValue();
-							var onError = null;
-							let command = {
+							let fixup = compiler.getPc();
+							compiler.addCommand({
 								domain: `rest`,
 								keyword: `rest`,
 								lino,
 								request: `get`,
 								target: targetRecord.name,
 								url,
-								onError
-							};
+								onError: null
+							});
 							if (compiler.tokenIs(`or`)) {
 								compiler.next();
-								command.onError = compiler.getPc() + 1;
-								compiler.addCommand(command);
+								compiler.getCommandAt(fixup).onError = compiler.getPc() + 1;
 								compiler.completeHandler();
-							} else {
-								compiler.addCommand(command);
-							}
+							} 
 							return true;
 						}
 					}

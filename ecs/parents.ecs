@@ -79,7 +79,7 @@
        	put property `mother` of MainRecord into ID
         if ID is not empty
         begin
-	   		rest get ParentsRecord from `/people/` cat ID cat `.json`
+	   		rest get ParentsRecord from `/people/P` cat ID cat `.json`
             or begin
              	alert `Record ` cat ID cat ` not found`
                 stop
@@ -92,7 +92,7 @@
        	put property `father` of MainRecord into ID
         if ID is not empty
         begin
-   			rest get ParentsRecord from `/people/` cat ID cat `.json`
+   			rest get ParentsRecord from `/people/P` cat ID cat `.json`
             or begin
                	alert `Record ` cat ID cat ` not found`
                 stop
@@ -117,7 +117,7 @@ FindParent:
     while N is less than the json count of Index
     begin
     	put element N of Index into ID
-    	rest get ParentsRecord from `/people/` cat ID cat `.json`
+    	rest get ParentsRecord from `/people/P` cat ID cat `.json`
         put property `fname` of ParentsRecord into F
         put property `gname` of ParentsRecord into G
         if Parent is empty json add ID to Selection
@@ -157,7 +157,7 @@ FindParent:
         while N is less than the json count of Selection
         begin
         	put element N of Selection into ID
-    		rest get ParentsRecord from `/people/` cat ID cat `.json`
+    		rest get ParentsRecord from `/people/P` cat ID cat `.json`
             put property `fname` of ParentsRecord into F
             put property `gname` of ParentsRecord into G
             put property `dob` of ParentsRecord into D
@@ -189,7 +189,7 @@ FindParent:
 	stop
 
 Chosen:
-    rest get ParentsRecord from `/people/` cat ID cat `.json`
+    rest get ParentsRecord from `/people/P` cat ID cat `.json`
     put property `gname` of ParentsRecord into G
     put property `fname` of ParentsRecord into F
     set the content of Parent to G cat ` ` cat F

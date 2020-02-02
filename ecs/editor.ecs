@@ -12,6 +12,7 @@
     div Topics
     div Buttons
     div ButtonGroup
+    div RecordID
     span Label
     input GivenName
     input OtherNames
@@ -46,6 +47,16 @@ Setup:
     create Title in Form
     set the style of Title to `text-align:center;font-size:1.1em;font-weight:bold;margin-top:0.5em`
     set the content of Title to `Record editor`
+
+	create Row in Form
+    set the class of Row to `rowstyle`
+    create Label in Row
+    set the class of Label to `labelstyle`
+    set the content of Label to `Record ID:`
+    create Input in Row
+    set the class of Input to `inputstyle`
+    create RecordID in Input
+    set the style of RecordID to `width:100%`
 
 	create Row in Form
     set the class of Row to `rowstyle`
@@ -135,16 +146,17 @@ Setup:
     set the text of CancelButton to `Cancel`
     on click CancelButton
     begin
-    	rest get Record from `/people/` cat ID cat `.json` or stop
+    	rest get Record from `/people/P` cat ID cat `.json` or stop
         go to Cancel
     end
     
     on message
     begin
       	put the message into ID
-    	if ID is `-` put `P` cat now into ID
+    	if ID is `-` put `` cat now into ID
         set Record to object
-       	rest get Record from `/people/` cat ID cat `.json` or stop
+       	rest get Record from `/people/P` cat ID cat `.json` or stop
+        set the content of RecordID to ID
         put property `gname` of Record into Item
         set the content of GivenName to Item
         put property `fname` of Record into Item
@@ -187,14 +199,13 @@ NewRecord:
     clear FamilyName
     send `clear` to ParentsModule
     set Record to object
-    put `P` cat now into ID
+    put now into ID
     stop
 
 !	Save the current record
 SaveRecord:
     if GivenName is empty stop
     ! Write the record
-    set property `id` of Record to ID
     set property `gname` of Record to GivenName
     set property `oname` of Record to OtherNames
     set property `fname` of Record to FamilyName
@@ -202,7 +213,7 @@ SaveRecord:
     else if attribute `checked` of GenderF put `f` into G
     else put `o` into G
     set property `gender` of Record to G
-    rest post Record to `save/people/` cat ID cat `.json`
+    rest post Record to `save/people/P` cat ID cat `.json`
     rest get Script from `/ecs/map.ecs`
     run Script
     print `Record for '` cat GivenName cat ` ` cat FamilyName cat `' saved`
