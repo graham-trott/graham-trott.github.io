@@ -2106,13 +2106,21 @@ const EasyCoder_Core = {
 				// This is the name of the property
 				const itemName = program.getValue(command.name);
 				// This is the value of the property
-				const itemValue = program.getValue(command.value);
+				let itemValue = program.getValue(command.value);
+				if (program.isJsonString(itemValue)) {
+					itemValue = JSON.parse(itemValue);
+				}
 				targetRecord = program.getSymbolRecord(command.target);
-				targetValue = targetRecord.value[targetRecord.index];
+				let targetValue = targetRecord.value[targetRecord.index];
 				// Get the existing JSON
-				let content = targetValue.content;
-				if (!targetValue.numeric && program.isJsonString(content)) {
-					content = JSON.parse(content);
+				if (!targetValue.numeric) {
+					let content = targetValue.content;
+					if (content === ``) {
+						content = {};
+					}
+					else if (program.isJsonString(content)) {
+						content = JSON.parse(content);
+					}
 					// Set the property
 					content[itemName] = itemValue;
 					// Put it back
@@ -3581,9 +3589,7 @@ const EasyCoder = {
 		if (v.type === `boolean`) {
 			return v.content ? `true` : `false`;
 		}
-		if (typeof v.content !==`undefined` && v.content.length >= 2
-			// && (v.content.substr(0, 2) === `{"` || v.content[0] === `[`)) {
-			&& [`[`, `{`].includes(v.content[0])) {
+		if (this.isJsonString(v.content)) {
 			try {
 				const parsed = JSON.parse(v.content);
 				return JSON.stringify(parsed, null, 2);
@@ -4300,14 +4306,17 @@ const EasyCoder_Value = {
 		if (value) {
 			switch (encoding) {
 			case `ec`:
-				return value.replace(/'/g, `~sq~`)
+				return value.replace(/\n/g, `%0a`)
+					.replace(/\r/g, `%0d`)
 					.replace(/"/g, `~dq~`)
-					.replace(/\n/g, `%0a`)
-					.replace(/\r/g, `%0d`);
+					.replace(/'/g, `~sq~`)
+					.replace(/\\/g, `~bs~`);
 			case `url`:
 				return encodeURIComponent(value.replace(/\s/g, `+`));
 			case `sanitize`:
 				return value.normalize(`NFD`).replace(/[\u0300-\u036f]/g, ``);
+			default:
+				return value;
 			}
 		}
 		return value;
@@ -4317,13 +4326,16 @@ const EasyCoder_Value = {
 		if (value) {
 			switch (encoding) {
 			case `ec`:
-				return value.replace(/~dq~/g, `"`)
+				return value.replace(/%0a/g, `\n`)
+					.replace(/%0d/g, `\r`)
+					.replace(/~dq~/g, `"`)
 					.replace(/~sq~/g, `'`)
-					.replace(/%0a/g, `\n`)
-					.replace(/%0d/g, `\r`);
+					.replace(/~bs~/g, `\\`);
 			case `url`:
 				const decoded = decodeURIComponent(value);
 				return decoded.replace(/\+/g, ` `);
+			default:
+				return value;
 			}
 		}
 		return value;

@@ -18,6 +18,8 @@ def listScripts(path):
             dd.append(file)
         else:
             ff.append(file)
+    dd.sort()
+    ff.sort()
     d = json.dumps(dd)
     f = json.dumps(ff)
     return '{"dirs":' + d + ',"files":' + f + '}'

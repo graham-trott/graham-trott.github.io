@@ -15,7 +15,7 @@ const EasyCoder_Plugins = {
      * When all the plugins have been added, EasyCoder starts up.
      */
 
-    setPluginCount(3);  // *** IMPORTANT *** the number of plugins you will be adding
+    setPluginCount(4);  // *** IMPORTANT *** the number of plugins you will be adding
     
     getPlugin('browser',
       `${window.location.origin}${path}/easycoder/plugins/browser.js`,
@@ -35,6 +35,12 @@ const EasyCoder_Plugins = {
         addPlugin('rest', EasyCoder_Rest);
       });
     
+    getPlugin('showdown',
+      `${window.location.origin}${path}/easycoder/plugins/showdown.js`,
+      function() {
+        addPlugin('showdown', EasyCoder_Showdown);
+      });
+    
   },
   
   getLocalPlugin: (path, name, getPlugin, addPlugin, callback) => {
@@ -46,14 +52,6 @@ const EasyCoder_Plugins = {
      */
     
     switch (name) {
-		case `ckeditor`:
-			getPlugin(name,
-				`${window.location.origin}${path()}/easycoder/plugins/ckeditor.js`,
-				function () {
-					addPlugin(name, EasyCoder_CKEditor, callback);
-				});
-			break;
-
 		case `codemirror`:
 			getPlugin(name,
 				`${window.location.origin}${path()}/easycoder/plugins/codemirror.js`,
@@ -62,27 +60,11 @@ const EasyCoder_Plugins = {
 				});
 			break;
 
-		case `ui`:
-			getPlugin(name,
-				`${window.location.origin}${path()}/easycoder/plugins/ui.js`,
-				function () {
-					addPlugin(name, EasyCoder_UI, callback);
-				});
-			break;
-
 		case `gmap`:
 			getPlugin(name,
 				`${window.location.origin}${path()}/easycoder/plugins/gmap.js`,
 				function () {
 					addPlugin(name, EasyCoder_GMap, callback);
-				});
-			break;
-
-		case `showdown`:
-			getPlugin(name,
-				`${window.location.origin}${path()}/easycoder/plugins/showdown.js`,
-				function () {
-					addPlugin(name, EasyCoder_Showdown, callback);
 				});
 			break;
 
