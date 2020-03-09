@@ -1,7 +1,0 @@
-{
-    "left":"10vw",
-    "top":"10vh",
-    "width":"calc(80vw - 20px)",
-    "height":"calc(80vh - 20px)",
-    "background": "#dbc19a"
-}
