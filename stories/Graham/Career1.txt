@@ -1,0 +1,6 @@
+Links: ~select:-:Select a subject!selected disabled hidden|T-Kent:The move to Kent|T-Grammar school:Grammar school|T-University:University|T-Relationships:Relationships~~space:3~Next: ~tid:Career2:Jumping ship~
+
+## My first career
+
+
+Links: ~select:-:Select a subject!selected disabled hidden|T-Kent:The move to Kent|T-Grammar school:Grammar school|T-University:University|T-Relationships:Relationships~~space:3~Next: ~tid:Career2:Jumping ship~
