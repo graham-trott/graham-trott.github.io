@@ -1,4 +1,4 @@
-## About this website ##
+## About this website
 
 Everyone has a story to tell; the only question is where to tell it. In the past, people wrote diaries if they were able to, and some of the wealthier ones published their memoirs. Some of these documents survive only in physical form; others have been digitized.
 
@@ -14,6 +14,6 @@ Storyteller is easy to use and anyone can build their own website with it. Most 
 
 ### Customising this website
 
-You may like to experiment with an alternative _theme_; that is, the border style of the page. We are collecting themes and you can choose from those currently available by clicking ~theme:here~.
+You may like to experiment with an alternative _theme_; that is, the border style of the page. Storyteller offers a small choice of different themes and you can choose from those currently available by clicking ~theme:here~.
 
 Email enquires can be made to [the author of the system](mailto:gtanyware@gmail.com).
